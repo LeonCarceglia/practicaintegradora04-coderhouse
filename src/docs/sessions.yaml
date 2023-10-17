@@ -1,0 +1,134 @@
+openapi: "3.1.0"
+info:
+  title: API Sessions
+  version: "1.0"
+paths:
+  api/sessions/register:
+    post:
+      summary: Register the new user.
+      tags:
+        - Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/registerUser"
+      responses:
+        "200":
+          description: The user has been registered.
+        "500":
+          description: Server error.
+  api/sessions/login:
+    post:
+      summary: Login the user if exists.
+      tags:
+        - Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/loginUser"
+      responses:
+        "200":
+          description: The user logged succesfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+  api/sessions/github:
+    get:
+      summary: Login with github account.
+      tags:
+        - Sessions
+      responses:
+        "200":
+          description: The user logged with github succesfully.
+        "500":
+          description: Server error.
+  api/sessions/github/callback:
+    get:
+      summary: Callback from github login, redirects to products view.
+      tags:
+        - Sessions
+      responses:
+        "200":
+          description: The user has been succesfully logged with github, redirection to products view.
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        first_name:
+          type: string
+          description: Name from the user
+        last_name:
+          type: string
+          description: Last name from the user
+        email:
+          type: string
+          description: Email from user
+        password:
+          type: string
+          description: Password from the user
+        age:
+          type: number
+          description: Age of the user
+        cart:
+          type: string
+          description: Id from the cart assigned
+        role:
+          type: string
+          description: Role in the page, can be user, premium or admin.
+      example:
+        _id: ObjectId("jryw487h98h4fy87h4")
+        first_name: Jose
+        last_name: Sosa
+        email: jose@sosa.com
+        password: jose123
+        age: 20
+        cart: ObjectId("jtyw486p98h4fy85h4")
+        role: premium
+  requestBodies:
+    registerUser:
+      description: Body with the new user.
+      properties:
+        first_name:
+          type: string
+          description: Name from the user
+        last_name:
+          type: string
+          description: Last name from the user
+        email:
+          type: string
+          description: Email from user
+        password:
+          type: string
+          description: Password from the user
+        age:
+          type: number
+          description: Age of the user
+      example:
+        first_name: Jose
+        last_name: Sosa
+        email: jose@sosa.com
+        password: jose123
+        age: 20
+    loginUser:
+      description: Body with the login user.
+      properties:
+        email:
+          type: string
+          description: Email from user
+        password:
+          type: string
+          description: Password from the user
+      example:
+        email: jose@sosa.com
+        password: jose123

@@ -1,0 +1,292 @@
+openapi: "3.1.0"
+info:
+  title: API Carts
+  version: "1.0"
+paths:
+  /api/carts/:
+    post:
+      summary: Create a new cart empty or with the body sent.
+      tags:
+        - Carts
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/createCart"
+      responses:
+        "200":
+          description: Cart created succesfully.
+          content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Cart"
+    get:
+      summary: Return all the carts.
+      tags:
+        - Carts
+      responses:
+        "200": 
+          description: All the carts has been returned.
+  /api/carts/:cid:
+    get:
+      summary: Return the cart with the id sended if exists.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+      responses:
+        "200":
+          description: Cart returned.
+        "500":
+          description: Server error or cart not found.
+    put:
+      summary: Update the cart with the id sended if exists.
+      tags: 
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/updateCart"
+      responses:
+        "200":
+          description: Cart updated.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cart"
+        "500":
+          description: Server error or cart not found.
+    delete:
+      summary: Delete the cart with the id sended if exists.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+      responses:
+        "204":
+          description: Cart deleted.
+        "500":
+          description: Server error or cart not found.
+  /api/carts/:cid/product/:pid/:quantity?:
+    post:
+      summary: Add product to the cart, both id sended and quantity.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+        - name: pid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+        - name: quantity
+          in: path
+          requried: false
+          description: Quantity from the product added
+          type: number
+      responses:
+        "201":
+          description: Product added to the cart succesfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cart"
+        "500":
+          description: Server error, product or cart not found.
+  /api/carts/:cid/product/:pid/:
+    delete:
+      summary: Delete the product from the cart, both id sended.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+        - name: pid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+      responses:
+        "204":
+          description: Product deleted succesfully.
+        "500":
+          description: Server error, product or cart not found.
+    put:
+      summary: Update the quantity from the product in the cart, both id sended.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+        - name: pid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/updateProductQuantity"
+      responses:
+        "200":
+          description: Product quantity updated succesfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cart"
+        "500":
+          description: Server error, product or cart not found.
+  /api/carts/:cid/purchase:
+    post:
+      summary: Finish the purchase and create ticket.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Mongo ID
+          type: string
+      responses:
+        "200":
+          description: Purchase succesfully realized.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ticket"
+        "500":
+          description: Error in create ticket or server.
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartProducts"
+          description: Array of objects with products and quantity.
+      example:
+        _id: ObjectId("jryw487h98h4fy87h4")
+        products: [{
+          product: ObjectId("jryw487h9phv532h7a4"),
+          quantity: 100
+        }]
+    CartProducts:
+      type: object
+      properties:
+        product:
+          type: string
+          description: Mongo ID from product.
+        quantity:
+          type: Number
+          description: Quantity from products from the id.
+      example:
+        product: ObjectId("jryw487h9phv532h7a4")
+        quantity: 100
+    Ticket:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        code:
+          type: string
+          description: Random and unique ticket code.
+        purchase_datetime:
+          type: date
+          description: Day when the ticket was created.
+        amount:
+          type: number
+          description: Total value from the ticket.
+        purchaser:
+          type: string
+          description: Email from the purchaser.
+      example:
+        _id: ObjectId("ohip987h9klz032a7h4")
+        code: 2960489
+        purchase_datetime: 2023-08-31T21:50:17.344+00:00
+        amount: 1534
+        purchaser: josesosa@mail.com
+  requestBodies:
+    createCart:
+      description: Cart to create.
+      properties:
+        cart:
+          type: object
+          description: New cart to create.
+      example:
+        _id: ObjectId("jryw487h98h4fy87h4")
+        products: [{
+          product: ObjectId("jryw487h9phv532h7a4"),
+          quantity: 100
+        }]
+    updateCart:
+      description: Products to update in the cart
+      properties:
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+      example:
+        products: [{
+          _id: ObjectId("jryw487h98h4fy87h4"),
+          title: Sweater,
+          description: coat over t-shirt,
+          code: 12345,
+          price: 245,
+          status: true,
+          stock: 23,
+          category: unisex,
+          thumbnails: [sweaterlink.com]
+        }]
+    updateProductQuantity:
+      description: Quantity to update from products.
+      properties:
+        quantity:
+          type: number
+          description: Quantity from the product.
+      example:
+        quantity: 20

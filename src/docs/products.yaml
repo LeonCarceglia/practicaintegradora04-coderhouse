@@ -1,0 +1,233 @@
+openapi: "3.1.0"
+info:
+  title: API Products
+  version: "1.0"
+paths:
+  /api/products/:limit?/:page?/:query?/:sort?:
+    get:
+      summary: Return all the products, can select the limit, page, query or sort of the products.
+      tags:
+        - Products
+      parameters:
+        - name: limit
+          in: path
+          required: false
+          description: Limit from objects to show
+          type: number
+        - name: page
+          in: path
+          required: false
+          description: Number of page to show
+          type: number
+        - name: query
+          in: path
+          required: false
+          description: Type of query to show
+          type: string
+        - name: sort
+          in: path
+          required: false
+          description: How to sort the products
+          type: string
+      responses:
+        "200":
+          description: All the products has been returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /api/products/:id:
+    get:
+      summary: Return the product with the id searched if exists.
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id from the product
+          type: string
+      respones:
+        "200":
+          description: The product has been returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Product"
+    put:
+      summary: Update the product with the product sended by body, only admins can do it.
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id from the product
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/updateProduct"
+      respones:
+        "200":
+          description: The product has been updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Product"
+        "401":
+          description: Cant authenticate.
+        "403":
+          description: Acces deniend, dont have permisions.
+        "500":
+          description: Server error.
+    delete: 
+      summary: Delete the product with the id searched if exist, only admins can do it.
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id from the product
+          type: string
+      respones:
+        "204":
+          description: The product has been deleted.
+  /api/products/:
+    post:
+      summary: Create the product with the product sended by body, only admins can do it.
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/createProduct"
+      responeses:
+        "201":
+          description: The product has been created.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Product"
+        "500":
+          description: Server error.
+  /api/products/mockingprocuts:
+    post:
+      summary: Create random products using faker librarie, only admins can do it.
+      tags:
+        - Products
+      respones:
+        "201":
+          description: The products has been created.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Product"       
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        title:
+          type: string
+          description: Title from the product
+        description:
+          type: string
+          description: Description of the product
+        code:
+          type: number
+          description: Code of the product, has to been unique
+        price:
+          type: number
+          description: Price of the product
+        status:
+          type: boolean
+          description: Status of the product, default true.
+        stock:
+          type: number
+          description: Quantity of the product.
+        category:
+          type: string
+          description: Category of the product
+        thumbnails:
+          type: array
+          description: Images of the product, defualt is empty.
+      example:
+        _id: ObjectId("jryw487h98h4fy87h4")
+        title: Sweater
+        description: coat over t-shirt
+        code: 12345
+        price: 245
+        status: true
+        stock: 23
+        category: unisex
+        thumbnails: [sweaterlink.com]
+  requestBodies:
+    updateProduct:
+      description: Body with product to update
+      properties:
+        title:
+          type: string
+          description: Title from the product
+        description:
+          type: string
+          description: Description of the product
+        code:
+          type: number
+          description: Code of the product, has to been unique
+        price:
+          type: number
+          description: Price of the product
+        category:
+          type: string
+          description: Category of the product
+      example:
+        title: Sweater
+        description: coat over t-shirt
+        code: 12345
+        price: 245
+        stock: 23
+        category: unisex
+    createProduct:
+      description: Body with product to create
+      properties:
+        title:
+          type: string
+          description: Title from the product
+        description:
+          type: string
+          description: Description of the product
+        code:
+          type: number
+          description: Code of the product, has to been unique
+        price:
+          type: number
+          description: Price of the product
+        category:
+          type: string
+          description: Category of the product
+      example:
+        title: Sweater
+        description: coat over t-shirt
+        code: 12345
+        price: 245
+        stock: 23
+        category: unisex

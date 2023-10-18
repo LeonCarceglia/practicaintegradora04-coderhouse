@@ -30,13 +30,12 @@ const updatePass = async (req, res) => {
 
 const premium = async (req, res) => {
   const userRole = await userService.updateRole(req.session.user)
-  res.send({ status: userRole[0], payload: userRole[1] })
+  res.status(userRole[0]).send({payload: userRole[1] })
 }
 
 const uploadDocuments = async (req, res) => {
   const uploadedFiles = req.files
   const uid = req.params.uid
-  console.log(uploadedFiles)
   const userDocs = await userService.uploadDocs(uid, uploadedFiles)
   res.send({ status: "success", payload: userDocs })
 }

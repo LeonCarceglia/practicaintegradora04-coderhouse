@@ -57,15 +57,15 @@ export default class UsersManager {
                     const newRole = "premium"
                     await userModel.findByIdAndUpdate(user._id, { role: newRole })
                     user.role = newRole
-                    return ["Role updated successfully", user]
+                    return [200, user]
                 } else {
-                    return ["Error", "The user has not finished processing their documentation"]
+                    return [400, "The user has not finished processing their documentation"]
                 }
             } else {
-                return ["Error", "The user is already premium"]
+                return [400, "The user is already premium"]
             }
         } else {
-            return ["Error", "Invalid role"]
+            return [400, "Invalid role"]
         }
     }
 

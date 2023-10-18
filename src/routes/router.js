@@ -65,22 +65,35 @@ export default class CustomRouter {
         }
     }
 
-    uploadMiddleware(fieldName) {
-        const storage = multer.diskStorage({
-            destination: (req, file, cb) => {
-                let uploadPath = 'uploads/documents'
-                if (fieldName === 'profileImage') {
-                    uploadPath = 'uploads/profiles'
-                } else if (fieldName === 'productImage') {
-                    uploadPath = 'uploads/products'
+    configureUploadMiddleware = () => {
+        return (req, res, next) => {
+            const fieldName = req.body.profileImage || req.body.productImage
+            console.log(req.body)
+            if (!fieldName) {
+                return res.status(400).send({ status: "error", error: "Invalid field name" })
+            }
+            const storage = multer.diskStorage({
+                destination: (req, file, cb) => {
+                    let uploadPath = 'uploads/documents'
+                    if (fieldName === 'profileImage') {
+                        uploadPath = 'uploads/profiles'
+                    } else if (fieldName === 'productImage') {
+                        uploadPath = 'uploads/products'
+                    }
+                    cb(null, uploadPath)
+                },
+                filename: (req, file, cb) => {
+                    cb(null, file.originalname)
+                },
+            })
+            const upload = multer({ storage: storage }).array(fieldName)
+            upload(req, res, (error) => {
+                if (error) {
+                    return res.status(400).send({ status: "error", error: "Error uploading files" })
                 }
-                cb(null, uploadPath)
-            },
-            filename: (req, file, cb) => {
-                cb(null, file.originalname)
-            },
-        })
-        return multer({ storage: storage }).array(fieldName)
+                next()
+            })
+        }
     }
 
     applyCallbacks(callbacks) {
